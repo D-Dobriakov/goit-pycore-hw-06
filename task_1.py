@@ -1,66 +1,77 @@
 from collections import UserDict
+from typing import List, Optional
+
 
 class Field:
-    def __init__(self, value):
+    def __init__(self, value: str) -> None:
         self.value = value
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.value)
-    
+
+
 class Name(Field):
+    '''
+    Обов'язкове поле
+    '''
     pass
 
+
 class Phone(Field):
-    def __init__(self, value):
+    def __init__(self, value: str) -> None:
+        '''
+        Валідація номера телефону (10 цифр)
+        '''
         if not (len(value) == 10 and value.isdigit()):
-            raise ValueError("Phone number must contain exact 10 digits.")
+            raise ValueError("Phone number must contain exactly 10 digits.")
         super().__init__(value)
 
-class Record: 
-    def __init__(self, name):
-        self.name = Name(name)
-        self.phones = []
 
-    def add_phone(self, phone_number):
+class Record:
+    def __init__(self, name: str) -> None:
+        self.name: Name = Name(name)
+        self.phones: List[Phone] = []
+
+    def add_phone(self, phone_number: str) -> None:
         self.phones.append(Phone(phone_number))
 
-    def remove_phone(self, phone_number):
+    def remove_phone(self, phone_number: str) -> None:
         phone_to_remove = self.find_phone(phone_number)
         if phone_to_remove:
             self.phones.remove(phone_to_remove)
 
-    def edit_phone(self, old_number, new_number):
+    def edit_phone(self, old_number: str, new_number: str) -> None:
         phone_obj = self.find_phone(old_number)
         if not phone_obj:
             raise ValueError(f"Phone number {old_number} not found.")
-        
         new_phone = Phone(new_number)
-    
         index = self.phones.index(phone_obj)
         self.phones[index] = new_phone
 
-    def find_phone(self, phone_number):
+    def find_phone(self, phone_number: str) -> Optional[Phone]:
         for phone in self.phones:
             if phone.value == phone_number:
                 return phone
         return None
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}"
 
+
 class AddressBook(UserDict):
-    def add_record(self, record):
+    def add_record(self, record: Record) -> None:
         self.data[record.name.value] = record
 
-    def find(self, name):
+    def find(self, name: str) -> Optional[Record]:
         return self.data.get(name)
 
-    def delete(self, name):
+    def delete(self, name: str) -> None:
         if name in self.data:
             del self.data[name]
 
 
 if __name__ == "__main__":
+
     book = AddressBook()
 
     john_record = Record("John")
